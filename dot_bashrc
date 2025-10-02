@@ -130,7 +130,23 @@ if command -v fzf >/dev/null 2>&1; then
   [ -f ~/.fzf.bash ] && . ~/.fzf.bash
 fi
 
-# Optional: auto-start tmux on SSH (uncomment to enable)
-# if [ -n "$SSH_CONNECTION" ] && [ -z "$TMUX" ] && command -v tmux >/dev/null 2>&1; then
-#   tmux new -A -s main
-# fi
+# ── Auto-attach tmux on SSH ─────────────────────────────────────────────
+# Behavior:
+# - If any tmux sessions exist: attach to the most recently used one.
+# - Else: attach/create the default session (name can be overridden).
+TMUX_DEFAULT_SESSION="${TMUX_DEFAULT_SESSION:-main}"
+
+if [[ -n "$SSH_CONNECTION" && -z "$TMUX" && $- == *i* ]] && command -v tmux >/dev/null 2>&1; then
+  # If there are existing sessions, pick the most recently attached
+  if tmux ls >/dev/null 2>&1; then
+    last_sess="$(tmux ls -F "#{session_last_attached} #{session_name}" 2>/dev/null \
+      | sort -n \
+      | tail -1 \
+      | awk '{print $2}')"
+    if [[ -n "$last_sess" ]]; then
+      tmux attach -t "$last_sess" && return
+    fi
+  fi
+  # Fallback: attach to or create the default session
+  tmux new -A -s "$TMUX_DEFAULT_SESSION"
+fi
