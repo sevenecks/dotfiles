@@ -1,0 +1,29 @@
+# ~/.gitconfig
+
+[user]
+    name = Seven Ecks
+    email = sevenecks@gmail.com
+    signingkey = # optional: your GPG/SSH signing key
+
+[core]
+    editor = vim         # or nano, code --wait, etc.
+    autocrlf = input     # keep LF on Unix, convert CRLF on Windows
+    excludesfile = ~/.gitignore_global
+
+[color]
+    ui = auto
+
+[push]
+    default = simple
+
+[pull]
+    rebase = true
+
+[merge]
+    conflictstyle = diff3
+
+[diff]
+    tool = vimdiff        # or meld, kdiff3, etc.
+
+[init]
+    defaultBranch = main
