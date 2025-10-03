@@ -18,6 +18,15 @@ HISTFILESIZE=200000
 HISTCONTROL=ignoredups:erasedups   # no dupes, collapse older dupes
 HISTTIMEFORMAT='%F %T '            # 2025-10-02 17:05:13
 
+# Normalize the erase key so Backspace deletes
+case "$(tput kbs 2>/dev/null || printf x)" in
+  $'\177') stty erase '^?' 2>/dev/null ;;
+  $'\010') stty erase '^H'  2>/dev/null ;;
+esac
+
+# User-local bin
+export PATH="$HOME/.local/bin:$PATH"
+
 # ─────────────────────────────────────────────────────────
 # Better less for non-text files
 # ─────────────────────────────────────────────────────────
@@ -103,12 +112,12 @@ else
   PROMPT_COMMAND=prompt_cmd
 fi
 
-# Terminal title for xterm-compatible terms
-case "$TERM" in
-  xterm*|rxvt*|tmux*|screen*)
-    PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME%%.*}: ${PWD/#$HOME/~}\007";'"$PROMPT_COMMAND"
-    ;;
-esac
+# Terminal title for xterm-compatible terms (DISABLED to let Kitty control titles)
+# case "$TERM" in
+#   xterm*|rxvt*|tmux*|screen*)
+#     PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME%%.*}: ${PWD/#$HOME/~}\007";'"$PROMPT_COMMAND"
+#     ;;
+# esac
 
 # ─────────────────────────────────────────────────────────
 # Aliases & helpers
@@ -121,6 +130,7 @@ alias gf='git fetch'
 alias gaa='git add .'
 alias gr='git remote -v'
 alias gcmsg='git commit -m'   # usage: gcmsg "message"
+alias czp='chezmoi git add . && chezmoi git commit -m "update" && chezmoi git push'
 
 # Common QoL
 mkcd() { mkdir -p -- "$1" && cd -- "$1"; }
