@@ -165,3 +165,10 @@ if [[ -n "$SSH_CONNECTION" && -z "$TMUX" && $- == *i* ]] \
   # Otherwise, create/attach to default
   tmux new -A -s "$TMUX_DEFAULT_SESSION"
 fi
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+
+# alias nvim to vim
+#echo "alias vim='nvim'" >> ~/.bashrc
+source ~/.bashrc
