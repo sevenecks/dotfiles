@@ -4,24 +4,24 @@
 # Exit if non-interactive
 # ─────────────────────────────────────────────────────────
 case $- in
-  *i*) ;;
-  *) return;;
+*i*) ;;
+*) return ;;
 esac
 
 # ─────────────────────────────────────────────────────────
 # History (big, useful, de-duplicated, with timestamps)
 # ─────────────────────────────────────────────────────────
-shopt -s histappend           # append to history, don’t overwrite
-shopt -s cmdhist              # save multi-line commands as one
+shopt -s histappend # append to history, don’t overwrite
+shopt -s cmdhist    # save multi-line commands as one
 HISTSIZE=100000
 HISTFILESIZE=200000
-HISTCONTROL=ignoredups:erasedups   # no dupes, collapse older dupes
-HISTTIMEFORMAT='%F %T '            # 2025-10-02 17:05:13
+HISTCONTROL=ignoredups:erasedups # no dupes, collapse older dupes
+HISTTIMEFORMAT='%F %T '          # 2025-10-02 17:05:13
 
 # Normalize the erase key so Backspace deletes
 case "$(tput kbs 2>/dev/null || printf x)" in
-  $'\177') stty erase '^?' 2>/dev/null ;;
-  $'\010') stty erase '^H'  2>/dev/null ;;
+$'\177') stty erase '^?' 2>/dev/null ;;
+$'\010') stty erase '^H' 2>/dev/null ;;
 esac
 
 # User-local bin
@@ -36,7 +36,7 @@ export PATH="$HOME/.local/bin:$PATH"
 # Colors & ls/grep aliases (GNU coreutils)
 # ─────────────────────────────────────────────────────────
 if command -v dircolors >/dev/null 2>&1; then
-  test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
 fi
 
 alias ls='ls -laFh --color=auto --group-directories-first'
@@ -52,11 +52,11 @@ alias egrep='egrep --color=auto'
 # Bash completion
 # ─────────────────────────────────────────────────────────
 if ! shopt -oq posix; then
-  if [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
-  elif [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
-  fi
+    if [ -f /usr/share/bash-completion/bash_completion ]; then
+        . /usr/share/bash-completion/bash_completion
+    elif [ -f /etc/bash_completion ]; then
+        . /etc/bash_completion
+    fi
 fi
 
 # ─────────────────────────────────────────────────────────
@@ -66,58 +66,58 @@ fi
 
 # Colors
 c_reset='\[\e[0m\]'
-c_user='\[\e[1;33m\]'   # bold yellow
-c_host='\[\e[1;32m\]'   # bold green
-c_path='\[\e[1;34m\]'   # bold blue
-c_git='\[\e[1;35m\]'    # bold magenta
-c_err='\[\e[1;31m\]'    # bold red
-c_ok='\[\e[1;32m\]'     # bold green
+c_user='\[\e[1;33m\]' # bold yellow
+c_host='\[\e[1;32m\]' # bold green
+c_path='\[\e[1;34m\]' # bold blue
+c_git='\[\e[1;35m\]'  # bold magenta
+c_err='\[\e[1;31m\]'  # bold red
+c_ok='\[\e[1;32m\]'   # bold green
 
 # Prefer __git_ps1 if present (from git-prompt)
 if [ -f /usr/lib/git-core/git-sh-prompt ] || [ -f /usr/share/git-core/contrib/completion/git-prompt.sh ] || [ -f /usr/share/bash-completion/completions/git ]; then
-  # Try common locations
-  [ -f /usr/lib/git-core/git-sh-prompt ] && . /usr/lib/git-core/git-sh-prompt
-  [ -f /usr/share/git-core/contrib/completion/git-prompt.sh ] && . /usr/share/git-core/contrib/completion/git-prompt.sh
-  # some distros expose __git_ps1 via bash-completion git script
-  [ -f /usr/share/bash-completion/completions/git ] && . /usr/share/bash-completion/completions/git
+    # Try common locations
+    [ -f /usr/lib/git-core/git-sh-prompt ] && . /usr/lib/git-core/git-sh-prompt
+    [ -f /usr/share/git-core/contrib/completion/git-prompt.sh ] && . /usr/share/git-core/contrib/completion/git-prompt.sh
+    # some distros expose __git_ps1 via bash-completion git script
+    [ -f /usr/share/bash-completion/completions/git ] && . /usr/share/bash-completion/completions/git
 
-  GIT_PS1_SHOWDIRTYSTATE=1
-  GIT_PS1_SHOWSTASHSTATE=1
-  GIT_PS1_SHOWUPSTREAM=auto
+    GIT_PS1_SHOWDIRTYSTATE=1
+    GIT_PS1_SHOWSTASHSTATE=1
+    GIT_PS1_SHOWUPSTREAM=auto
 
-  prompt_cmd() {
-    local rc=$?
-    local status="${c_ok}✔${c_reset}"
-    [ $rc -ne 0 ] && status="${c_err}✘${rc}${c_reset}"
-    local host_color="$c_host"
-    [ -n "$SSH_CONNECTION" ] && host_color='\[\e[1;36m\]' # cyan when SSH
+    prompt_cmd() {
+        local rc=$?
+        local status="${c_ok}✔${c_reset}"
+        [ $rc -ne 0 ] && status="${c_err}✘${rc}${c_reset}"
+        local host_color="$c_host"
+        [ -n "$SSH_CONNECTION" ] && host_color='\[\e[1;36m\]' # cyan when SSH
 
-    PS1="${status} ${c_user}\u${c_reset}@${host_color}\h${c_reset}:${c_path}\w${c_reset} ${c_git}$(__git_ps1 '[%s]')${c_reset}\n\$ "
-  }
-  PROMPT_COMMAND=prompt_cmd
+        PS1="${status} ${c_user}\u${c_reset}@${host_color}\h${c_reset}:${c_path}\w${c_reset} ${c_git}$(__git_ps1 '[%s]')${c_reset}\n\$ "
+    }
+    PROMPT_COMMAND=prompt_cmd
 else
-  # Fallback minimal git branch parser
-  parse_git_branch() {
-    git rev-parse --abbrev-ref HEAD 2>/dev/null | sed 's/^/[/;s/$/]/'
-  }
-  prompt_cmd() {
-    local rc=$?
-    local status="${c_ok}✔${c_reset}"
-    [ $rc -ne 0 ] && status="${c_err}✘${rc}${c_reset}"
-    local host_color="$c_host"
-    [ -n "$SSH_CONNECTION" ] && host_color='\[\e[1;36m\]'
+    # Fallback minimal git branch parser
+    parse_git_branch() {
+        git rev-parse --abbrev-ref HEAD 2>/dev/null | sed 's/^/[/;s/$/]/'
+    }
+    prompt_cmd() {
+        local rc=$?
+        local status="${c_ok}✔${c_reset}"
+        [ $rc -ne 0 ] && status="${c_err}✘${rc}${c_reset}"
+        local host_color="$c_host"
+        [ -n "$SSH_CONNECTION" ] && host_color='\[\e[1;36m\]'
 
-    PS1="${status} ${c_user}\u${c_reset}@${host_color}\h${c_reset}:${c_path}\w${c_reset} ${c_git}$(parse_git_branch)${c_reset}\n\$ "
-  }
-  PROMPT_COMMAND=prompt_cmd
+        PS1="${status} ${c_user}\u${c_reset}@${host_color}\h${c_reset}:${c_path}\w${c_reset} ${c_git}$(parse_git_branch)${c_reset}\n\$ "
+    }
+    PROMPT_COMMAND=prompt_cmd
 fi
 
 # Terminal title for xterm-compatible terms (DISABLED to let Kitty control titles)
- case "$TERM" in
-   xterm*|rxvt*|tmux*|screen*)
-     PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME%%.*}: ${PWD/#$HOME/~}\007";'"$PROMPT_COMMAND"
-     ;;
- esac
+case "$TERM" in
+xterm* | rxvt* | tmux* | screen*)
+    PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME%%.*}: ${PWD/#$HOME/~}\007";'"$PROMPT_COMMAND"
+    ;;
+esac
 
 # ─────────────────────────────────────────────────────────
 # Aliases & helpers
@@ -129,7 +129,7 @@ alias gs='git status'
 alias gf='git fetch'
 alias gaa='git add .'
 alias gr='git remote -v'
-alias gcmsg='git commit -m'   # usage: gcmsg "message"
+alias gcmsg='git commit -m' # usage: gcmsg "message"
 alias czp='chezmoi git add . && chezmoi git commit -- -m "update" && chezmoi git push'
 
 # Common QoL
@@ -137,7 +137,7 @@ mkcd() { mkdir -p -- "$1" && cd -- "$1"; }
 
 # Optional: fzf integration if installed
 if command -v fzf >/dev/null 2>&1; then
-  [ -f ~/.fzf.bash ] && . ~/.fzf.bash
+    [ -f ~/.fzf.bash ] && . ~/.fzf.bash
 fi
 
 # ── Auto-attach tmux on SSH ─────────────────────────────────────────────
@@ -147,28 +147,29 @@ fi
 # - Auto-start tmux on SSH, except for certain hosts
 TMUX_DEFAULT_SESSION="${TMUX_DEFAULT_SESSION:-main}"
 
-if [[ -n "$SSH_CONNECTION" && -z "$TMUX" && $- == *i* ]] \
-   && command -v tmux >/dev/null 2>&1 \
-   && [[ "$HOSTNAME" != "super" ]]; then
+if [[ -n "$SSH_CONNECTION" && -z "$TMUX" && $- == *i* ]] &&
+    command -v tmux >/dev/null 2>&1 &&
+    [[ "$HOSTNAME" != "super" ]]; then
 
-  # If there are existing sessions, attach to most recent
-  if tmux ls >/dev/null 2>&1; then
-    last_sess="$(tmux ls -F "#{session_last_attached} #{session_name}" 2>/dev/null \
-      | sort -n \
-      | tail -1 \
-      | awk '{print $2}')"
-    if [[ -n "$last_sess" ]]; then
-      tmux attach -t "$last_sess" && return
+    # If there are existing sessions, attach to most recent
+    if tmux ls >/dev/null 2>&1; then
+        last_sess="$(tmux ls -F "#{session_last_attached} #{session_name}" 2>/dev/null |
+            sort -n |
+            tail -1 |
+            awk '{print $2}')"
+        if [[ -n "$last_sess" ]]; then
+            tmux attach -t "$last_sess" && return
+        fi
     fi
-  fi
 
-  # Otherwise, create/attach to default
-  tmux new -A -s "$TMUX_DEFAULT_SESSION"
+    # Otherwise, create/attach to default
+    tmux new -A -s "$TMUX_DEFAULT_SESSION"
 fi
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 
-# alias nvim to vim
-echo "alias vim='nvim'" >> ~/.bashrc
-alias vim='nvim'
+# alias vim to nvim if Neovim is installed
+if command -v nvim >/dev/null 2>&1; then
+    alias vim='nvim'
+fi
